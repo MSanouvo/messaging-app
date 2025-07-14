@@ -1,0 +1,23 @@
+{
+  "name": "messaging-app",
+  "version": "1.0.0",
+  "description": "Using my current knowledge of React and Express Js to make a mock messaging app inspired by discord",
+  "homepage": "https://github.com/MSanouvo/messaging-app#readme",
+  "bugs": {
+    "url": "https://github.com/MSanouvo/messaging-app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MSanouvo/messaging-app.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "\t",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
