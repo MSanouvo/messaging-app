@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-// const router = require('/Routers/router.js')
+const router = require('/Routers/router.js')
 // const controller = require('/Controllers/controller.js')
 const session = require("express-session")
 const { PrismaSessionStore } = require("@quixo3/prisma-session-store")
@@ -39,7 +39,7 @@ app.use(express.json())
 // app.use(controller.passport.session())
 
 
-// app.use('/', router)
+app.use('/', router)
 
 app.listen(PORT, () =>  {
 	console.log(`Server Running on port: ${PORT}`)
