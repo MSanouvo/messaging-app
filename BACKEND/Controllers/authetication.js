@@ -1,4 +1,4 @@
-const {body, validationResult } = require("express-validator")
+const { body, validationResult } = require("express-validator")
 const bcrypt = require("bcrypt")
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy;
@@ -30,6 +30,7 @@ passport.use(
                     username: username
                 }
             })
+            console.log(user)
             if(!user) {
                 return done(null, false, { message: "Username does not exist" })
             }
@@ -80,7 +81,7 @@ const signUp = [
                     email: user.email
                 }
             })
-            console.log(newUser)
+            // console.log(newUser)
             res.status(200).json({ success: true, message: "User account created successfully" })
         } catch(err) {
             console.log(err)
@@ -89,11 +90,31 @@ const signUp = [
 ]
 
 const login = [
-    passport.authenticate("local"),
+    passport.authenticate('local'),
     function(req, res){
-        res.status(200).json({ success: true, message: "User logged in successfully" })
+        // console.log('received')
+        // console.log(req.body)
+        try {
+            console.log('logged in')
+            res.status(200).json({ success: true, message: "User logged in successfully" })
+        } catch(err){
+            console.log('not logged in')
+            console.log(err)
+        }
     }
 ]
+
+// function login(req, res, next){
+//   passport.authenticate('local', (err, user, info) => {
+//     console.log('Passport callback:', { err, user, info });
+//     if (err) return next(err);
+//     if (!user) return res.status(401).json({ message: 'Unauthorized' });
+//     req.logIn(user, (err) => {
+//       if (err) return next(err);
+//       return res.json({ message: 'Login successful' });
+//     });
+//   });
+// }
 
 async function getUsers(req, res){
     const users = await prisma.Users.findMany({
@@ -133,5 +154,6 @@ module.exports = {
     signUp,
     login,
     getUsers,
-    deleteUser
+    deleteUser,
+    passport
 }

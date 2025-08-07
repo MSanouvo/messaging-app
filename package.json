@@ -15,7 +15,7 @@
   "type": "commonjs",
   "main": "\t",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand --force-exit",
     "start": "node BACKEND/app.js"
   },
   "dependencies": {

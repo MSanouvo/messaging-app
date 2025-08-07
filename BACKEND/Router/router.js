@@ -9,6 +9,10 @@ router.get("/users", authentication.getUsers)
 router.post("/login", authentication.login)
 router.post("/sign-up", authentication.signUp)
 router.delete("/:user/delete", authentication.deleteUser)
+router.get('/test', (req, res) => {
+    console.log('receiving request')
+    res.json({ message: "test "})
+})
 
 // router.get("/:user/profile/", profileController.getProfile)
 // router.put("/:user/profile/edit", profileController.editProfile)
