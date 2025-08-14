@@ -30,21 +30,31 @@ app.use(
   );
 app.use('/', router)
 
-// beforeEach(async () => {
-//     try {
-//         const pass = await bcrypt.hash('testPassword', 10)
-//         await prisma.users.create({
-//             data: {
-//                 username: "test",
-//                 password: pass,
-//                 display_name: "Test Login",
-//                 email: "test@email.test"
-//             }
-//         })
-//     } catch (err) {
-//         console.log(err)
-//     }
-// })
+beforeEach(async () => {
+    //REFACTOR TO BE OUR SIGN UP ROUTE SO WE CAN INCLUDE GENEREATED PROFILES
+    const test = await request(app)
+        .post("/sign-up")
+        .type('form')
+        .send({
+            username: 'test',
+            password: 'testPassword',
+            email: 'test@email.test',
+            display: "Test Login"
+        })
+    // try {
+    //     const pass = await bcrypt.hash('testPassword', 10)
+    //     await prisma.users.create({
+    //         data: {
+    //             username: "test",
+    //             password: pass,
+    //             display_name: "Test Login",
+    //             email: "test@email.test"
+    //         }
+    //     })
+    // } catch (err) {
+    //     console.log(err)
+    // }
+})
 
 afterEach(async () => {
     await prisma.users.deleteMany()
@@ -81,17 +91,8 @@ test('sign up', async () => {
 })
 
 test('login', async () => {
-    const checkUser = await prisma.users.findMany()
-    console.log(checkUser)
-    const create = await request(app)
-        .post("/sign-up")
-        .type("form")
-        .send({
-            username: "test",
-            password: "testPassword",
-            email: "test@test.com",
-            display: "Test Uuser"
-        })
+    // const checkUser = await prisma.users.findMany()
+    // console.log(checkUser)
     const test = await request(app)
         .post("/login")
         .type('form')
@@ -104,4 +105,32 @@ test('login', async () => {
         success: true,
         message: "User logged in successfully"
     })
+})
+
+test('check user profile', async() => {
+    const checkUser = await prisma.users.findFirst()
+    const testUser = checkUser.id
+    // const login = await request(app)
+    //     .post('/login')
+    //     .type('form')
+    //     .send({
+    //         username: 'test',
+    //         password: 'testPassword'
+    //     })
+    const test = await request(app)
+        .get(`/${testUser}/profile`)
+    expect(test.status).toBe(200)
+})
+
+test('edit user profile', async() => {
+    const checkUser = await prisma.users.findFirst()
+    const test = await request(app)
+        .put(`/${checkUser.id}/profile/edit`)
+        .type('form')
+        .send({
+            color: 'red',
+            bio: 'updated bio',
+            pfp: 'update.url'
+        })
+    expect(test.status).toBe(200)
 })

@@ -2,20 +2,20 @@ const { Router } = require("express")
 const authentication = require("../Controllers/authetication")
 // const messageController = require("../Controllers/messages")
 // const conversationController = require("../Controllers/conversations")
-// const profileController = require("../Controllers/profiles")
+const profileController = require("../Controllers/profiles")
 const router = Router()
 
 router.get("/users", authentication.getUsers)
 router.post("/login", authentication.login)
 router.post("/sign-up", authentication.signUp)
 router.delete("/:user/delete", authentication.deleteUser)
-router.get('/test', (req, res) => {
-    console.log('receiving request')
-    res.json({ message: "test "})
-})
+// router.get('/test', (req, res) => {
+//     console.log('receiving request')
+//     res.json({ message: "test "})
+// })
 
-// router.get("/:user/profile/", profileController.getProfile)
-// router.put("/:user/profile/edit", profileController.editProfile)
+router.get("/:user/profile/", profileController.getProfile)
+router.put("/:user/profile/edit", profileController.editProfile)
 
 // router.get("/conversation/all", conversationController.getConvos)
 // router.post("/conversation/new", conversationController.createConvo)

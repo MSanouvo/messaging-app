@@ -67,7 +67,7 @@ model Profiles {
   userId       Int
   date_created DateTime @default(now())
   color        String   @default("grey")
-  bio          String   @db.VarChar(255)
+  bio          String   @default("") @db.VarChar(255)
   pfp          String   @default("defaultUrl")
 }
 

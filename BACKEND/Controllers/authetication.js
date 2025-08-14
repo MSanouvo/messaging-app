@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt")
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy;
 const { PrismaClient } = require("@prisma/client")
+const profile = require("./profiles")
 
 const prisma = new PrismaClient()
 
@@ -82,6 +83,13 @@ const signUp = [
                 }
             })
             // console.log(newUser)
+            //CALL CREATE PROFILE FUNCTION SO WE CAN HAVE USER PROFILES CREATED AT THE SAME TIME AS THEIR ACCOUNT
+            const userID = await prisma.users.findUnique({
+                where: {
+                    username: user.username
+                }
+            })
+            profile.createProfile(userID)
             res.status(200).json({ success: true, message: "User account created successfully" })
         } catch(err) {
             console.log(err)
