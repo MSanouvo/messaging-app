@@ -16,7 +16,7 @@
   "main": "\t",
   "scripts": {
     "test": "jest --runInBand --force-exit",
-    "start": "node BACKEND/app.js"
+    "start": "node BACKEND/app.js --watch"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",

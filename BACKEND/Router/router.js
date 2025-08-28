@@ -1,7 +1,7 @@
 const { Router } = require("express")
 const authentication = require("../Controllers/authetication")
 // const messageController = require("../Controllers/messages")
-// const conversationController = require("../Controllers/conversations")
+const conversationController = require("../Controllers/conversations")
 const profileController = require("../Controllers/profiles")
 const router = Router()
 
@@ -18,7 +18,7 @@ router.get("/:user/profile/", profileController.getProfile)
 router.put("/:user/profile/edit", profileController.editProfile)
 
 // router.get("/conversation/all", conversationController.getConvos)
-// router.post("/conversation/new", conversationController.createConvo)
+router.post("/conversation/new", conversationController.createConvo)
 // router.post("/conversation/:id/add", conversationController.addUserToConvo)
 // router.post("/conversation/:id/enter", conversationController.enterConvo)
 // router.delete("/conversation/:id/kick", conversationController.kickUserFromConvo)

@@ -1,5 +1,4 @@
 const { PrismaClient } = require("@prisma/client")
-const { connect } = require("../Router/router")
 
 const prisma = new PrismaClient()
 
@@ -16,35 +15,69 @@ async function createConvo(req, res){
     const name = req.body.name
     const password = req.body.password
     const isPublic = req.body.isPublic
-    const user = req.session.user
-    const recipients = req.body.users
-
+    // const user = req.session.user
+    // Need to refactor host/recipient selection
+    const user = req.body.host
+    const recipients = req.body.recipient
+    // ------------------------------------------
     const newConvo = await prisma.conversations.create({
-        data:{
-            name: name,
+        data: {
+            name: name, 
             password: password,
             isPublic: isPublic
-        }
+        }, 
     })
-
+    console.log(newConvo)
     const host = await prisma.userConvos.create({
         data: {
             user: {
                 connect: {
-                    id: user.id
+                    id: Number(user),
                 }
             },
             convo: {
                 connect: {
-                    id: newConvo.id
+                    id: Number(newConvo.id)
                 }
             },
             role: 'Admin'
         }
     })
+    console.log(host)
+    await addUser(recipients, newConvo.id)
+    // const recipient = await prisma.userConvos.create({
+    //     data: {
+    //         user: {
 
+    //         }
+    //     }
+    // })
     //Add recipients to convo
    res.status(200).json({ success: true })
+}
+
+async function addUser(display, convo){
+    const user = await prisma.users.findUnique({
+        where: {
+            username: display
+        }
+    })
+
+    const addUser = await prisma.userConvos.create({
+        data: {
+            user: {
+                connect: {
+                    id: Number(user.id)
+                }
+            },
+            convo: {
+                connect: {
+                    id: Number(convo)
+                }
+            }
+        }
+    })
+    console.log(addUser)
 }
 
 async function addUserToConvo(req, res){
@@ -222,4 +255,21 @@ async function deleteConversation(req, res){
         }
     })
     res.status(200).json({ success: true })
+}
+
+// async function addTestConvo(req, res){
+//     const test = await prisma.conversations.create({
+
+//     })
+// }
+
+module.exports = {
+    getConversations,
+    createConvo,
+    addUserToConvo,
+    enterConvo,
+    kickUser,
+    leaveConvo,
+    deleteConversation,
+    changeRole
 }

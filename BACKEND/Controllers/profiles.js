@@ -28,7 +28,7 @@ async function createProfile(userID){
 			},
 		}
 	})
-    console.log(newProfile)
+    // console.log(newProfile)
 }
 
 async function editProfile(req, res){

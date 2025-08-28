@@ -32,7 +32,7 @@ app.use('/', router)
 
 beforeEach(async () => {
     //REFACTOR TO BE OUR SIGN UP ROUTE SO WE CAN INCLUDE GENEREATED PROFILES
-    const test = await request(app)
+    const user1 = await request(app)
         .post("/sign-up")
         .type('form')
         .send({
@@ -41,23 +41,21 @@ beforeEach(async () => {
             email: 'test@email.test',
             display: "Test Login"
         })
-    // try {
-    //     const pass = await bcrypt.hash('testPassword', 10)
-    //     await prisma.users.create({
-    //         data: {
-    //             username: "test",
-    //             password: pass,
-    //             display_name: "Test Login",
-    //             email: "test@email.test"
-    //         }
-    //     })
-    // } catch (err) {
-    //     console.log(err)
-    // }
+    const user2 = await request(app)
+        .post("/sign-up")
+        .type('form')
+        .send({
+            username: 'test2',
+            password: 'test2Password',
+            email: 'test2@email.test',
+            display: "Convo Test"
+        })
 })
 
 afterEach(async () => {
     await prisma.users.deleteMany()
+    await prisma.conversations.deleteMany()
+    await prisma.userConvos.deleteMany()
 })
 
 // afterAll(async ()=> {
@@ -131,6 +129,22 @@ test('edit user profile', async() => {
             color: 'red',
             bio: 'updated bio',
             pfp: 'update.url'
+        })
+    expect(test.status).toBe(200)
+})
+
+test('create convo', async() => {
+    const host = await prisma.users.findFirst()
+    console.log(host)
+    const test = await request(app)
+        .post('/conversation/new')
+        .type('form')
+        .send({
+            name: 'test convo',
+            password: '',
+            // isPublic: true,
+            host: host.id,
+            recipient: 'test2'
         })
     expect(test.status).toBe(200)
 })
