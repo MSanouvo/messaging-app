@@ -13,14 +13,15 @@ async function getMessages(req, res){
 
 async function createMessage(req, res){
     const message = req.body.message
-    const user = req.session.user
-    const convo = req.param
+    // const user = req.session.user
+    const user = req.body.user
+    const convo = req.params.id
     const newMessage = await prisma.messages.create({
         data: {
             message: message,
             author: {
                 connect: {
-                    username: user.username
+                    username: user
                 }
             },
             convo: {
@@ -35,17 +36,18 @@ async function createMessage(req, res){
 
 async function editMessage(req, res){
     const newMessage = req.body.message
-    const messageId = req.param.id
-    const user = req.session.user
+    const messageId = req.params.messageId
+    // const user = req.session.user
+    const user = req.body.user
     const message = await prisma.messages.findUnique({
         where: {
             id: messageId
         }
     })
 
-    if(message.author != user.username){
-        return res.status(403).json({ error: 'User not authroized!' })
-    }
+    // if(message.authorId != user.id){
+    //     return res.status(403).json({ error: 'User not authroized!' })
+    // }
 
     const edit = await prisma.messages.update({
         where: {

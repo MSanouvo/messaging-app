@@ -2,16 +2,16 @@ const { PrismaClient } = require("@prisma/client")
 
 const prisma = new PrismaClient()
 
-async function getConversations(req, res){
+async function getConversations(req, res) {
     const conversation = await prisma.conversations.findMany({
         where: {
             isPublic: true
         }
     })
-    res.status(200).json({ conversations: conversation})
+    res.status(200).json({ conversations: conversation })
 }
 
-async function createConvo(req, res){
+async function createConvo(req, res) {
     const name = req.body.name
     const password = req.body.password
     const isPublic = req.body.isPublic
@@ -22,10 +22,10 @@ async function createConvo(req, res){
     // ------------------------------------------
     const newConvo = await prisma.conversations.create({
         data: {
-            name: name, 
+            name: name,
             password: password,
             isPublic: isPublic
-        }, 
+        },
     })
     console.log(newConvo)
     const host = await prisma.userConvos.create({
@@ -53,10 +53,10 @@ async function createConvo(req, res){
     //     }
     // })
     //Add recipients to convo
-   res.status(200).json({ success: true })
+    res.status(200).json({ success: true })
 }
 
-async function addUser(display, convo){
+async function addUser(display, convo) {
     const user = await prisma.users.findUnique({
         where: {
             username: display
@@ -80,117 +80,116 @@ async function addUser(display, convo){
     console.log(addUser)
 }
 
-async function addUserToConvo(req, res){
+//Come back and test this later or find way to distinguish it
+async function addUserToConvo(req, res) {
     const user = req.session.user
     const convoId = req.param.id
     const recipient = req.body.user
+    await addUser(recipient, convoId)
+    // const findUser = await prisma.users.findUnique({
+    //     where:{
+    //         username: recipient
+    //     }
+    // })
 
-    const findUser = await prisma.users.findUnique({
-        where:{
-            username: recipient
-        }
-    })
-
-    const addUser = await prisma.userConvos.create({
-        data: {
-            userId: {
-                connect: {
-                    id: findUser.id
-                }
-            },
-            convoId: {
-                connect: {
-                    id: convoId
-                }
-            }
-        }
-    })
+    // const addUser = await prisma.userConvos.create({
+    //     data: {
+    //         userId: {
+    //             connect: {
+    //                 id: findUser.id
+    //             }
+    //         },
+    //         convoId: {
+    //             connect: {
+    //                 id: convoId
+    //             }
+    //         }
+    //     }
+    // })
     res.status(200).json({ success: true })
 }
 
-async function enterConvo(req,res){
-    const user = req.session.user
-    const convoId = req.param.id
+async function enterConvo(req, res) {
+    // const user = req.session.user
+    const user = req.body.user
+    const convoId = req.params.id
     const password = req.body.password
-
+    console.log(req.body)
     const convo = await prisma.conversations.findUnique({
-        where:{
-            id: convoId
+        where: {
+            id: Number(convoId)
         }
     })
-
-    if(convo.password != password){
+    console.log(convo)
+    if (convo.password != password) {
         res.status(403).json({ message: 'Incorrect password' })
     }
 
-    const entry = await prisma.userConvos.create({
-        data: {
-            user: {
-                connect: {
-                    id: user.id
-                }
-            },
-            convo: {
-                connect: {
-                    id: convoId
-                }
-            }
-        }
-    })
+    await addUser(user, convoId)
     res.status(200).json({ success: true })
 }
 
-async function kickUser(req, res){
-    const user = req.session.user
-    const convoId = req.param.id
-    const victim = req.body.user
-    
+async function kickUser(req, res) {
+    // const user = req.session.user
+    const user = req.body.user
+    const convoId = Number(req.params.id)
+    const victim = req.body.kick
+
     const findUser = await prisma.users.findUnique({
         where: {
             username: victim
         }
     })
 
-    const userRole = await prisma.userConvos.findUnique({
+    const userRole = await prisma.userConvos.findFirst({
         where: {
-            userId: user.id,
+            userId: Number(user),
+            convoId: convoId
+        }
+    })
+    console.log(userRole)
+
+    if (userRole.role != 'Admin') {
+        res.status(403).json({ message: 'User not authorized!' })
+    }
+
+    //SEE IF WE CAN SIMPLIFY THIS 
+    const findUserConvo = await prisma.userConvos.findFirst({
+        where: {
+            userId: Number(findUser.id),
             convoId: convoId
         }
     })
 
-    if(userRole.role != 'Admin'){
-        res.status(403).json({ message: 'User not authorized!' })
-    }
-
     const removedUser = await prisma.userConvos.delete({
         where: {
-            userId: findUser.id,
-            convoId: convoId
+            id: findUserConvo.id
         }
     })
     res.status(200).json({ success: true })
 }
 
-async function changeRole(req, res){
+//NO ROUTE YET
+async function changeRole(req, res) {
     const user = req.session.user
     const convoId = req.param.id
     const recipient = req.body.user
     const newRole = req.body.role
 
     const requester = await prisma.userConvos.findUnique({
-        where:{
+        where: {
             userId: user.id,
             convoId: convoId
         }
     })
 
-    const recipientUser= await prisma.user.findUnique({
-        where:{
+    const recipientUser = await prisma.user.findUnique({
+        where: {
             username: recipient
         }
     })
 
-    if(requester.id != user.id){
+    if (requester.id != user.id) {
         res.status(403).json({ error: 'User not authorized!' })
     }
 
@@ -205,52 +204,54 @@ async function changeRole(req, res){
     })
     res.status(200).json({ success: true })
 }
+//
 
-async function leaveConvo(req, res){
-    const user = req.session.user
-    const convoId = req.param.id
+async function leaveConvo(req, res) {
+    // const user = req.session.user
+    const user = req.body.user
+    const convoId = Number(req.params.id)
 
-    const convoConnection = await prisma.userConvos.findUnique({
+    const convoConnection = await prisma.userConvos.findFirst({
         where: {
-            userId: userId,
+            userId: Number(user),
             convoId: convoId
         }
     })
 
-    if(convoConnection != undefined){
+    if (convoConnection === null) {
         res.status(403).json({ message: 'Cannot find user in conversation' })
     }
 
-    if(convoConnection.userId != user.id){
+    if (convoConnection.userId != user /* user.id */) {
         res.status(403).json({ message: 'User not authorized!' })
     }
 
     const removedUserConvo = await prisma.userConvos.delete({
-        where:{
-            userId: userId,
-            convoId: convoId
+        where: {
+            id: convoConnection.id
         }
     })
     res.status(200).json({ success: true })
 }
 
-async function deleteConversation(req, res){
-    const convoId = req.param.id
-    const user =  req.session.user
+async function deleteConversation(req, res) {
+    const convoId = Number(req.params.id)
+    // const user = req.session.user
+    const user = Number(req.body.user)
 
-    const userRole = await prisma.userConvos.findUnique({
-        where:{ 
+    const userRole = await prisma.userConvos.findFirst({
+        where: {
             userId: user.id,
             convoId: convoId
         }
     })
-
-    if(userRole.role != 'Admin'){
-        return res.status(403).json({ error: 'User not authorized!' })
+    console.log(userRole)
+    if (userRole.role != 'Admin') {
+        res.status(403).json({ error: 'User not authorized!' })
     }
 
     const deleteConvo = await prisma.conversations.delete({
-        where:{
+        where: {
             id: convoId
         }
     })
