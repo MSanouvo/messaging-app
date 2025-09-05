@@ -104,7 +104,7 @@ const login = [
         // console.log('received')
         // console.log(req.body)
         try {
-            console.log('logged in')
+            // console.log('logged in')
             res.status(200).json({ success: true, message: "User logged in successfully" })
         } catch(err){
             console.log('not logged in')

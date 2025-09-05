@@ -135,7 +135,7 @@ test('edit user profile', async () => {
 
 test('create convo/add recipient to convo', async () => {
     const host = await prisma.users.findFirst()
-    console.log(host)
+    // console.log(host)
     const test = await request(app)
         .post('/conversation/new')
         .type('form')
@@ -161,9 +161,9 @@ test('enter an open convo', async () => {
             host: host.id,
             recipient: 'test2'
         })
-    console.log(testConvo.status)
+    // console.log(testConvo.status)
     const convos = await prisma.conversations.findFirst()
-    console.log(convos.id)
+    // console.log(convos.id)
 
     const newUser = await request(app)
         .post("/sign-up")
@@ -174,7 +174,7 @@ test('enter an open convo', async () => {
             email: 'newtest@fakeemail.com',
             display: "Join Convo"
         })
-    console.log(newUser.status)
+    // console.log(newUser.status)
 
     const test = await request(app)
         .post(`/conversation/${convos.id}/enter`)
@@ -197,7 +197,7 @@ test('enter an open convo', async () => {
 
 test('remove user from a convo', async () => {
     const host = await prisma.users.findFirst()
-    console.log(host)
+    // console.log(host)
     const testConvo = await request(app)
         .post('/conversation/new')
         .type('form')
@@ -208,9 +208,9 @@ test('remove user from a convo', async () => {
             host: host.id,
             recipient: 'test2'
         })
-    console.log(testConvo.status)
+    // console.log(testConvo.status)
     const convos = await prisma.conversations.findFirst()
-    console.log(`id: ${convos.id}`)
+    // console.log(`id: ${convos.id}`)
 
     const test = await request(app)
         .delete(`/conversation/${convos.id}/kick`)
@@ -234,9 +234,9 @@ test('leave a convo', async () => {
             host: host.id,
             recipient: 'test2'
         })
-    console.log(testConvo.status)
+    // console.log(testConvo.status)
     const convos = await prisma.conversations.findFirst()
-    console.log(`id: ${convos.id}`)
+    // console.log(`id: ${convos.id}`)
 
     const test = await request(app)
         .delete(`/conversation/${convos.id}/leave`)
@@ -254,8 +254,8 @@ test('delete a convo', async () => {
             username: 'test2' 
         }
     })
-    console.log('USER')
-    console.log(user)
+    // console.log('USER')
+    // console.log(user)
     const testConvo = await request(app)
         .post('/conversation/new')
         .type('form')
@@ -266,9 +266,9 @@ test('delete a convo', async () => {
             host: host.id,
             recipient: 'test2'
         })
-    console.log(testConvo.status)
+    // console.log(testConvo.status)
     const convos = await prisma.conversations.findFirst()
-    console.log(`id: ${convos.id}`)
+    // console.log(`id: ${convos.id}`)
 
     const test = await request(app)
         .delete(`/conversation/${convos.id}/delete`)

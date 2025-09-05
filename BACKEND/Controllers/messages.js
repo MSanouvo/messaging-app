@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 async function getMessages(req, res){
     const messages = await prisma.messages.findMany({
         where: {
-            convoId: Number(req.param)
+            convoId: Number(req.params.id)
         }
     })
     res.status(200).json({ messges: messages})
@@ -15,7 +15,7 @@ async function createMessage(req, res){
     const message = req.body.message
     // const user = req.session.user
     const user = req.body.user
-    const convo = req.params.id
+    const convo = Number(req.params.id)
     const newMessage = await prisma.messages.create({
         data: {
             message: message,
@@ -24,30 +24,35 @@ async function createMessage(req, res){
                     username: user
                 }
             },
-            convo: {
+            conversation: {
                 connect: {
                     id: convo
                 }
             }
         }
     })
+    console.log(newMessage)
     res.status(200).json({ success: true })
 }
 
+//CHANGE TO EDIT ONLY IF IT IS MOST RECENT MESSAGE
 async function editMessage(req, res){
     const newMessage = req.body.message
-    const messageId = req.params.messageId
+    // console.log(newMessage)
+    const convoId = Number(req.params.id)
+    const messageId = Number(req.params.messageId)
     // const user = req.session.user
-    const user = req.body.user
-    const message = await prisma.messages.findUnique({
+    const user = Number(req.body.user)
+    const message = await prisma.messages.findFirst({
         where: {
-            id: messageId
+            id: messageId,
+            convoId: convoId
         }
     })
-
-    // if(message.authorId != user.id){
-    //     return res.status(403).json({ error: 'User not authroized!' })
-    // }
+    console.log(message)
+    if(message.authorId != user /* user.id */ ){
+        return res.status(403).json({ error: 'User not authroized!' })
+    }
 
     const edit = await prisma.messages.update({
         where: {
@@ -57,32 +62,37 @@ async function editMessage(req, res){
             message: newMessage
         }
     })
+    console.log(edit)
     res.status(200).json({ success: true })
 }
 
 async function deleteMessage(req, res){
-    const messageId = req.param.id
-    const user = req.session.user
-    const message = await prisma.messages.findUnique({
+    const messageId = Number(req.params.messageId)
+    // const user = req.session.user
+    const user = Number(req.body.user)
+    const convoId = Number(req.params.id)
+    const message = await prisma.messages.findFirst({
         where:{
-            id: messageId
+            id: messageId,
+            convoId: convoId
         }
     })
+    const userRole = await prisma.userConvos.findFirst({
+        where:{
+            userId: user,
+            convoId: convoId
+        }
+    })
+    console.log(userRole)
 
-    // const userRole = await prisma.users.findUnique({
-    //     where:{
-    //         id: user.id
-    //         //find user role
-    //     }
-    // })
-
-    // if(message.author != user.username || userRole.role != 'Admin'){
-    //     return res.status(403).json({ error: 'User not authorized!' })
-    // }
+    if(message.authorId != user /* user.id */ || userRole.role != 'Admin'){
+        return res.status(403).json({ error: 'User not authorized!' })
+    }
 
     const deleteMessage = await prisma.messages.delete({
         where: {
-            id: messageId
+            id: messageId,
+            convoId: convoId
         }
     })
     res.status(200).json({ success: true })

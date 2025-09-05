@@ -43,7 +43,7 @@ async function createConvo(req, res) {
             role: 'Admin'
         }
     })
-    console.log(host)
+    // console.log(host)
     await addUser(recipients, newConvo.id)
     // const recipient = await prisma.userConvos.create({
     //     data: {
@@ -77,7 +77,7 @@ async function addUser(display, convo) {
             }
         }
     })
-    console.log(addUser)
+    // console.log(addUser)
 }
 
 //Come back and test this later or find way to distinguish it
@@ -114,13 +114,13 @@ async function enterConvo(req, res) {
     const user = req.body.user
     const convoId = req.params.id
     const password = req.body.password
-    console.log(req.body)
+    // console.log(req.body)
     const convo = await prisma.conversations.findUnique({
         where: {
             id: Number(convoId)
         }
     })
-    console.log(convo)
+    // console.log(convo)
     if (convo.password != password) {
         res.status(403).json({ message: 'Incorrect password' })
     }
@@ -147,7 +147,7 @@ async function kickUser(req, res) {
             convoId: convoId
         }
     })
-    console.log(userRole)
+    // console.log(userRole)
 
     if (userRole.role != 'Admin') {
         res.status(403).json({ message: 'User not authorized!' })
@@ -241,11 +241,11 @@ async function deleteConversation(req, res) {
 
     const userRole = await prisma.userConvos.findFirst({
         where: {
-            userId: user.id,
+            userId: user,
             convoId: convoId
         }
     })
-    console.log(userRole)
+    // console.log(userRole)
     if (userRole.role != 'Admin') {
         res.status(403).json({ error: 'User not authorized!' })
     }

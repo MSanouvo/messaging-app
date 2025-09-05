@@ -1,6 +1,6 @@
 const { Router } = require("express")
 const authentication = require("../Controllers/authetication")
-// const messageController = require("../Controllers/messages")
+const messageController = require("../Controllers/messages")
 const conversationController = require("../Controllers/conversations")
 const profileController = require("../Controllers/profiles")
 const router = Router()
@@ -25,9 +25,9 @@ router.delete("/conversation/:id/kick", conversationController.kickUser)
 router.delete("/conversation/:id/leave", conversationController.leaveConvo)
 router.delete("/conversation/:id/delete", conversationController.deleteConversation)
 
-// router.get("/conversation/:id/messages", messageController.getMessages)
-// router.post("/conversation/:id/message/add", messageController.createMessage)
-// router.put("/converstation/:id/message/:messageId/edit", messageController.editMessage)
-// router.delete("/conversation:/id/message/:messageId/delete", messageController.deleteMessage)
+router.get("/conversation/:id/messages", messageController.getMessages)
+router.post("/conversation/:id/message/add", messageController.createMessage)
+router.put("/conversation/:id/message/:messageId/edit", messageController.editMessage)
+router.delete("/conversation/:id/message/:messageId/delete", messageController.deleteMessage)
 
 module.exports = router

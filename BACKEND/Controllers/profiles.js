@@ -7,13 +7,13 @@ async function getProfile(req, res){
 
     //USED PARAMS FOR TESTING NEED TO REFACTOR FOR REQ.SESSIONS AGAIN
     const user = req.params.user
-	console.log(user)
+	// console.log(user)
 	const profile = await prisma.profiles.findMany({
 		where: {
 			userId: Number(user)
 		}
 	})
-	console.log(profile)
+	// console.log(profile)
 	res.status(200).json({ success: true, profile: profile })
 }
 
